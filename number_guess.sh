@@ -16,6 +16,9 @@ then
 else
 #if username is not used before, print:
   echo Welcome, $USERNAME! It looks like this is your first time here.
+  $($PSQL "INSERT INTO users(name) VALUES($USERNAME)")
+  TOTAL_GAME=0
+  FEWEST_GUESS=999999
 fi
 
 echo Guess the secret number between 1 and 1000:
@@ -50,9 +53,12 @@ check_integer
 
 #if the secret number is guessed
 echo You guessed it in $NUMBER_OF_GUESS tries. The secret number was $SECRETNUMBER. Nice job!
-
+(( TOTAL_GAME++ ))
+FEWEST_GUESS=$(( NUMBER_OF_GUESS < FEWEST_GUESS ? NUMBER_OF_GUESS : FEWEST_GUESS ))
 
 #update database: users, games
+
+$($PSQL "UPDATE users SET total_game = TOTAL_GAME, fewest_guess = FEWEST_GUESS where name = USERNAME")
 
 
 
