@@ -1,5 +1,5 @@
 #!/bin/bash
-PSQL="psql --username=freecodecamp --dbname=<database_name> -t --no-align -c"
+PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 
 echo Enter your username:
 #database allows username: VARCHAR(22)
@@ -16,7 +16,7 @@ then
 else
 #if username is not used before, print:
   echo Welcome, $USERNAME! It looks like this is your first time here.
-  $($PSQL "INSERT INTO users(name) VALUES($USERNAME)")
+  $PSQL "INSERT INTO users(name) VALUES('$USERNAME')" > /dev/null
   TOTAL_GAME=0
   FEWEST_GUESS=999999
 fi
@@ -27,7 +27,16 @@ read GUESS
 
 NUMBER_OF_GUESS=0
 
-#check if it's integer
+# check if an input is integer
+check_integer() {
+  until [[ $GUESS =~ ^-?[0-9]+$ ]]
+  do 
+    #if input is not integer
+    echo That is not an integer, guess again:
+    read GUESS
+  done 
+}
+
 check_integer
 
   while (( GUESS != SECRETNUMBER )) 
@@ -57,18 +66,4 @@ echo You guessed it in $NUMBER_OF_GUESS tries. The secret number was $SECRETNUMB
 FEWEST_GUESS=$(( NUMBER_OF_GUESS < FEWEST_GUESS ? NUMBER_OF_GUESS : FEWEST_GUESS ))
 
 #update database: users, games
-
-$($PSQL "UPDATE users SET total_game = TOTAL_GAME, fewest_guess = FEWEST_GUESS where name = USERNAME")
-
-
-
-# check if an input is integer
-check_integer() {
-  until [[ $GUESS=~ ^-?[0-9]+$ ]]
-  do 
-    #if input is not integer
-    echo That is not an integer, guess again:
-    read GUESS
-  done 
-}
-
+$PSQL "UPDATE users SET total_game = $TOTAL_GAME, fewest_guess = $FEWEST_GUESS where name = '$USERNAME'" > /dev/null
