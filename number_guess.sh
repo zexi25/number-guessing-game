@@ -25,10 +25,9 @@ read GUESS
 NUMBER_OF_GUESS=0
 
 #check if it's integer
-if [[ $GUESS =~ ^-?[0-9]+$ ]]
-then
-  
-  while (( GUESS != SECRETNUMBER ))
+check_integer
+
+  while (( GUESS != SECRETNUMBER )) 
   do
     (( NUMBER_OF_GUESS++ ))
     
@@ -37,26 +36,33 @@ then
     #if guess is higher
       echo "It's lower than that, guess again:"
       read GUESS
+      check_integer
 
     elif (( SECRETNUMBER > GUESS ))
     then
     #if guess is lower
       echo "It's higher than that, guess again:"
       read GUESS
-
-    else
-      #if the secret number is guessed
-      echo You guessed it in $NUMBER_OF_GUESS tries. The secret number was $SECRETNUMBER. Nice job!
-
+      check_integer
+     
     fi
   done
 
-else
-#if input is not integer
-  echo That is not an integer, guess again:
-fi
+#if the secret number is guessed
+echo You guessed it in $NUMBER_OF_GUESS tries. The secret number was $SECRETNUMBER. Nice job!
 
 
 #update database: users, games
 
+
+
+# check if an input is integer
+check_integer() {
+  until [[ $GUESS=~ ^-?[0-9]+$ ]]
+  do 
+    #if input is not integer
+    echo That is not an integer, guess again:
+    read GUESS
+  done 
+}
 
